@@ -12,6 +12,8 @@ const slackey = require('slackey')
 
 // use `PORT` env var on Beep Boop - default to 3000 locally
 var port = process.env.PORT || 3000
+var beepboop = BeepBoop.start()
+
 beepboop.on('open', () => {
   console.log('connection to Beep Boop server opened')
 })
