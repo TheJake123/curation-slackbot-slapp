@@ -1,27 +1,36 @@
 {
-  "name": "starter-slapp-app",
+  "name": "curation-slackbot-slapp",
   "version": "1.0.0",
-  "description": "Basic Slack app using the Slapp library and Slack Events API",
+  "description": "",
   "scripts": {
     "watch": "nodemon server.js",
     "test": "standard"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/BeepBoopHQ/starter-slapp-app.git"
+    "url": "git+https://github.com/TheJake123/curation-slackbot-slapp.git"
   },
-  "author": "Brad Harris",
+  "author": "Jakob Strasser",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/BeepBoopHQ/starter-slapp-app/issues"
+    "url": "https://github.com/TheJake123/curation-slackbot-slapp/pulls"
   },
-  "homepage": "https://github.com/BeepBoopHQ/starter-slapp-app#readme",
+  "homepage": "https://github.com/TheJake123/curation-slackbot-slapp#readme",
   "dependencies": {
     "express": "^4.14.0",
     "nodemon": "^1.11.0",
-    "slapp": "^2.1.0",
-    "slapp-context-beepboop": "^1.3.0",
-    "slapp-convo-beepboop": "^1.0.1",
-    "standard": "^8.4.0"
+    "slapp": "^1.2.0",
+    "slapp-context-beepboop": "^1.1.0",
+    "slapp-convo-beepboop": "^1.0.0",
+    "standard": "^8.4.0",
+    "mysql": "^2.12.0",
+    "request": "^2.79.0",
+    "querystring": "^0.2.0",
+    "pipedrive": "^2.1.4",
+    "beepboop": "^1.1.1",
+    "promise-ratelimit": "^0.0.3",
+    "langdetect":"^0.2.1",
+    "body-parser":"^1.16.1",
+    "parameters-middleware":"^0.1.0"
   }
 }
