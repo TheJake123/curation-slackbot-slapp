@@ -4,6 +4,10 @@ const express = require('express')
 const Slapp = require('slapp')
 const ConvoStore = require('slapp-convo-beepboop')
 const Context = require('slapp-context-beepboop')
+const BeepBoop = require('beepboop')
+const bodyParser = require('body-parser')
+const parameters = require('parameters-middleware');
+var request = require('request')
 const slackey = require('slackey')
 
 // use `PORT` env var on Beep Boop - default to 3000 locally
