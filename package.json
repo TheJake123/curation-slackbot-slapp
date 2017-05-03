@@ -31,6 +31,7 @@
     "promise-ratelimit": "^0.0.3",
     "langdetect":"^0.2.1",
     "body-parser":"^1.16.1",
-    "parameters-middleware":"^0.1.0"
+    "parameters-middleware":"^0.1.0",
+    "slackey":"1.1.1"
   }
 }

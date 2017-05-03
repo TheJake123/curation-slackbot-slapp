@@ -4,10 +4,34 @@ const express = require('express')
 const Slapp = require('slapp')
 const ConvoStore = require('slapp-convo-beepboop')
 const Context = require('slapp-context-beepboop')
+const slackey = require('slackey')
 
 // use `PORT` env var on Beep Boop - default to 3000 locally
 var port = process.env.PORT || 3000
+beepboop.on('open', () => {
+  console.log('connection to Beep Boop server opened')
+})
+beepboop.on('error', (error) => {
+  console.log('Error from Beep Boop connection: ', err)
+})
+beepboop.on('close', (code, message) => {
+  console.log('Connection to Beep Boop was closed')
+})
+beepboop.on('add_resource', (message) => {
+  console.log('Team added: ', message)
+  console.log(message.resource.SlackBotAccessToken)
+  var slackAPIClient = slackey.getAPIClient(message.resource.SlackBotAccessToken);
+  slackAPIClient.send('chat.postMessage',
+	  {
+	    text: 'hello from nodejs! I am a robot, beep boop beep boop.',
+	    channel: '#general'
+	  },
+	  function(err, response) {
+	    console.log(err, response); // null {channel: ... 
+	  }
+	);
 
+})
 var slapp = Slapp({
   // Beep Boop sets the SLACK_VERIFY_TOKEN env var
   verify_token: process.env.SLACK_VERIFY_TOKEN,
