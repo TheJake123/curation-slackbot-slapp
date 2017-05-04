@@ -70,19 +70,111 @@ app.post('/recommendations',
                   "text": "Share to channel...",
                   "type": "select",
                   "options": [
-                	   {  
-            		      "text":"second",
-            		      "value":5
-            		   },
-            		   {  
-            		      "text":"test",
-            		      "value":6
-            		   },
             		   {  
             		      "text":"Test",
             		      "value":1
-            		   }
-                  ]
+            		   },
+            		   {  
+        			     "text":"Digital Marketing",
+        			     "value":7
+        			   },
+        			   {  
+        			      "text":"Legal",
+        			      "value":40
+        			   },
+        			   {  
+        			      "text":"Innovation & Startups",
+        			      "value":43
+        			   },
+        			   {  
+        			      "text":"Journalism",
+        			      "value":66
+        			   },
+        			   {  
+        			      "text":"Ondernemen",
+        			      "value":76
+        			   },
+        			   {  
+        			      "text":"Market Trends",
+        			      "value":82
+        			   },
+        			   {  
+        			      "text":"9x Awesome Content",
+        			      "value":83
+        			   },
+        			   {  
+        			      "text":"Business Practices",
+        			      "value":84
+        			   },
+        			   {  
+        			      "text":"Education Market",
+        			      "value":86
+        			   },
+        			   {  
+        			      "text":"Venture Capital & Startups",
+        			      "value":87
+        			   },
+        			   {  
+        			      "text":"Fintech",
+        			      "value":89
+        			   },
+        			   {  
+        			      "text":"Direct Marketing",
+        			      "value":101
+        			   },
+        			   {  
+        			      "text":"IT Business",
+        			      "value":109
+        			   },
+        			   {  
+        			      "text":"NN Algemeen",
+        			      "value":116
+        			   },
+        			   {  
+        			      "text":"Customer Insights",
+        			      "value":120
+        			   },
+        			   {  
+        			      "text":"CPS",
+        			      "value":125
+        			   },
+        			   {  
+        			      "text":"RMS",
+        			      "value":126
+        			   },
+        			   {  
+        			      "text":"IBM in the Media",
+        			      "value":136
+        			   },
+        			   {  
+        			      "text":"Randstad in the News",
+        			      "value":151
+        			   },
+        			   {  
+        			      "text":"Randstad Market Watch",
+        			      "value":152
+        			   },
+        			   {  
+        			      "text":"IBM Cloud Market Watch",
+        			      "value":170
+        			   },
+        			   {  
+        			      "text":"IBM Developer Advocates",
+        			      "value":219
+        			   },
+        			   {  
+        			      "text":"Achmea Transport",
+        			      "value":250
+        			   },
+        			   {  
+        			      "text":"Achmea Automotive",
+        			      "value":251
+        			   },
+        			   {  
+        			      "text":"Achmea Innovation",
+        			      "value":253
+        			   }
+        			]
               }
 	        ]
     }
@@ -161,6 +253,7 @@ app.post('/recommendations',
 )
 
 slapp.action('share', 'post', (msg, value) => {
+	if (!value) value = msg.body.actions.selected_options[0].value
     console.log(`Article ${msg.body.original_message.attachments[0].title_link} shared to channel ${value}`)
     var originalMsg = msg.body.original_message;
 	var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1];
