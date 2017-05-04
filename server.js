@@ -12,7 +12,7 @@ const slackey = require('slackey')
 var port = process.env.PORT || 3000
 var channels = {}
 
-var slackAPIClient 
+var slackAPIClient
 var beepboop = BeepBoop.start()
 
 beepboop.on('open', () => {
@@ -42,7 +42,7 @@ app.post('/recommendations',
   parameters({body : ["channel", "title", "url"]}),
   (req, res) => {
     var channelId = req.body.channel
-    var channel = '#general'//channels[channelId]
+    var channel = channels[channelId]
     if (channel == null) return res.status(400).send("Channel not found")
     var verifiedIcon = req.body.verified ? "http://smallbusiness.support/wp-content/uploads/2015/10/facebook-verified.png" : "https://cdn1.iconfinder.com/data/icons/rounded-flat-country-flag-collection-1/2000/_Unknown.png"
     var attachment = {
@@ -150,11 +150,29 @@ app.post('/recommendations',
 
 slapp.action('share', 'post', (msg, value) => {
     console.log(`Article ${msg.body.original_message.attachments[0].title_link} shared to channel ${value}`)
+    request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/item/add/url',
+    			{ json: {
+    				url: value
+    			}}, (err, res, body) => {
+    				if (err) console.log(err)
+    				var originalMsg = msg.body.original_message
+					var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1]
+				    chosenAttachment.actions = []
+					var lastAttachment = {
+						pretext: JSON.stringify(body)//`:postbox: Article posted to channel ${value}`,
+					} 
+					originalMsg.attachments = [chosenAttachment, lastAttachment]
+					msg.respond(msg.body.response_url, originalMsg)
+    			})
+	
+})
+
+slapp.action('share', 'discard', (msg, value) => {
 	var originalMsg = msg.body.original_message
 	var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1]
     chosenAttachment.actions = []
 	var lastAttachment = {
-		pretext: `:postbox: Article posted to channel ${value}`,
+		pretext: `:no_entry: Article discarded`,
 	} 
 	originalMsg.attachments = [chosenAttachment, lastAttachment]
 	msg.respond(msg.body.response_url, originalMsg)
