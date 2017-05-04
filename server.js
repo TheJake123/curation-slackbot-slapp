@@ -1,5 +1,4 @@
 'use strict'
-
 const express = require('express')
 const Slapp = require('slapp')
 const ConvoStore = require('slapp-convo-beepboop')
@@ -9,9 +8,12 @@ const bodyParser = require('body-parser')
 const parameters = require('parameters-middleware');
 var request = require('request')
 const slackey = require('slackey')
-
 // use `PORT` env var on Beep Boop - default to 3000 locally
 var port = process.env.PORT || 3000
+var channels = {}
+
+var slackAPIClient
+fetchChannels()
 var beepboop = BeepBoop.start()
 
 beepboop.on('open', () => {
@@ -26,17 +28,7 @@ beepboop.on('close', (code, message) => {
 beepboop.on('add_resource', (message) => {
   console.log('Team added: ', message)
   console.log(message.resource.SlackBotAccessToken)
-  var slackAPIClient = slackey.getAPIClient(message.resource.SlackBotAccessToken);
-  slackAPIClient.send('chat.postMessage',
-	  {
-	    text: 'hello from nodejs! I am a robot, beep boop beep boop.',
-	    channel: '#general'
-	  },
-	  function(err, response) {
-	    console.log(err, response); // null {channel: ... 
-	  }
-	);
-
+  slackAPIClient = slackey.getAPIClient(message.resource.SlackBotAccessToken);
 })
 var slapp = Slapp({
   // Beep Boop sets the SLACK_VERIFY_TOKEN env var
@@ -44,108 +36,159 @@ var slapp = Slapp({
   convo_store: ConvoStore(),
   context: Context()
 })
-
-
-var HELP_TEXT = `
-I will respond to the following messages:
-\`help\` - to see this message.
-\`hi\` - to demonstrate a conversation that tracks state.
-\`thanks\` - to demonstrate a simple response.
-\`<type-any-other-text>\` - to demonstrate a random emoticon response, some of the time :wink:.
-\`attachment\` - to see a Slack attachment message.
-`
-
-//*********************************************
-// Setup different handlers for messages
-//*********************************************
-
-// response to the user typing "help"
-slapp.message('help', ['mention', 'direct_message'], (msg) => {
-  msg.say(HELP_TEXT)
-})
-
-// "Conversation" flow that tracks state - kicks off when user says hi, hello or hey
-slapp
-  .message('^(hi|hello|hey)$', ['direct_mention', 'direct_message'], (msg, text) => {
-    msg
-      .say(`${text}, how are you?`)
-      // sends next event from user to this route, passing along state
-      .route('how-are-you', { greeting: text })
-  })
-  .route('how-are-you', (msg, state) => {
-    var text = (msg.body.event && msg.body.event.text) || ''
-
-    // user may not have typed text as their next action, ask again and re-route
-    if (!text) {
-      return msg
-        .say("Whoops, I'm still waiting to hear how you're doing.")
-        .say('How are you?')
-        .route('how-are-you', state)
+var app = express()
+app.use(bodyParser.json());
+app.post('/recommendations',
+  parameters({body : ["channel_id", "title", "url"]}),
+  (req, res) => {
+    var channelId = req.body.channelId
+    var channel = '#general'//channels[channelId]
+    if (channel == null) return res.status(400).send("Channel not found")
+    var verifiedIcon = req.body.verified ? "http://smallbusiness.support/wp-content/uploads/2015/10/facebook-verified.png" : "https://cdn1.iconfinder.com/data/icons/rounded-flat-country-flag-collection-1/2000/_Unknown.png"
+    var attachment = {
+    	callback_id: "share",
+	      author_icon: verifiedIcon,
+	      title_link: req.body.url,
+	      title: req.body.title,
+	      actions: [
+	          {
+	            "name": "post",
+	            "text": "Post",
+	            "type": "button",
+	            "style": "primary",
+	            "value": channelId
+	          },
+	          {
+	            "name": "discard",
+	            "text": "Discard",
+	            "type": "button",
+	            "style": "danger",
+	            "value": "discarded"
+	          }
+	        ]
     }
-
-    // add their response to state
-    state.status = text
-
-    msg
-      .say(`Ok then. What's your favorite color?`)
-      .route('color', state)
-  })
-  .route('color', (msg, state) => {
-    var text = (msg.body.event && msg.body.event.text) || ''
-
-    // user may not have typed text as their next action, ask again and re-route
-    if (!text) {
-      return msg
-        .say("I'm eagerly awaiting to hear your favorite color.")
-        .route('color', state)
+    if (req.body.host) {
+      attachment.author_name = req.body.host
+        attachment.author_link = req.body.host
     }
+    if (req.body.summary) {
+        attachment.text = req.body.summary
+    }
+    if (req.body.image_url) {
+        attachment.image_url = req.body.image_url
+    }
+    if (req.body.pub_date) {
+        attachment.ts = Date.parse(req.body.pub_date)
+    }
+    
+    // Populating fields
+    var fields = []
+    if (req.body.keywords) {
+      fields.push({
+        title: "Keywords",
+        short: false,
+        value: req.body.keywords
+          .map(elem => {
+              return elem.keyword;
+          }).join(", ")
+      })
+    }
+    if (req.body.companies) {
+      fields.push({
+        title: "Companies",
+        short: false,
+        value: req.body.companies
+          .map(elem => {
+              return elem.text;
+          }).join(", ")
+      })
+    }
+    if (req.body.word_count) {
+      fields.push({
+        title: "Length",
+        short: true,
+        value: req.body.word_count
+      })
+    }
+    if (req.body.engagement) {
+      fields.push({
+        title: "Shares",
+        short: true,
+        value: formatCount(req.body.engagement)
+      })
+    }
+    if (req.body.sentiment) {
+    	fields.push({
+            title: "Sentiment",
+            short: true,
+            value: req.body.sentiment
+          })
+    }
+    fields.push({
+    	"title": "Sponsored",
+        "value": ":warning: Undetected",
+        "short": true
+    })
+    attachment.fields = fields
+    slackAPIClient.send('chat.postMessage',
+          {
+          channel,
+          attachments: [attachment]
+          },
+          function(err, response) {
+          if (err) {
+            console.log(err)
+            res.status(500).send(err)
+          } else {
+            res.status(201).send(response)
+          }
 
-    // add their response to state
-    state.color = text
-
-    msg
-      .say('Thanks for sharing.')
-      .say(`Here's what you've told me so far: \`\`\`${JSON.stringify(state)}\`\`\``)
-    // At this point, since we don't route anywhere, the "conversation" is over
-  })
-
-// Can use a regex as well
-slapp.message(/^(thanks|thank you)/i, ['mention', 'direct_message'], (msg) => {
-  // You can provide a list of responses, and a random one will be chosen
-  // You can also include slack emoji in your responses
-  msg.say([
-    "You're welcome :smile:",
-    'You bet',
-    ':+1: Of course',
-    'Anytime :sun_with_face: :full_moon_with_face:'
-  ])
-})
-
-// demonstrate returning an attachment...
-slapp.message('attachment', ['mention', 'direct_message'], (msg) => {
-  msg.say({
-    text: 'Check out this amazing attachment! :confetti_ball: ',
-    attachments: [{
-      text: 'Slapp is a robust open source library that sits on top of the Slack APIs',
-      title: 'Slapp Library - Open Source',
-      image_url: 'https://storage.googleapis.com/beepboophq/_assets/bot-1.22f6fb.png',
-      title_link: 'https://beepboophq.com/',
-      color: '#7CD197'
-    }]
-  })
-})
-
-// Catch-all for any other responses not handled above
-slapp.message('.*', ['direct_mention', 'direct_message'], (msg) => {
-  // respond only 40% of the time
-  if (Math.random() < 0.4) {
-    msg.say([':wave:', ':pray:', ':raised_hands:'])
+          }
+        )
   }
+)
+
+slapp.action('share', 'post', (msg, value) => {
+    console.log(`Article ${msg.attachments[0].title_link} shared to channel ${value}`)
 })
+
+function fetchChannels() {
+  slackAPIClient.send('channels.list',
+      function(err, response) {
+        if (err) console.log(err)
+          for (var i = 0; i < response.channels.length; i++) {
+            var channel = response.channels[i]
+            try {
+              var channelNumber = channel.name.split("-")[0]
+              if (!isNaN(channelNumber)) {
+                channels[channelNumber] = channel.id
+              }
+            } catch (err) {
+              console.log(err)
+            }
+          }
+        console.log(`${Object.keys(channels).length} channels loaded`)
+        }
+  )
+}
+
+function formatCount(x) {
+  var magnitude = Math.max(Math.floor(Math.log10(Math.abs(x))), 0);
+  var postfix = ""
+  if (magnitude >= 6) {
+    magnitude -= 6
+    postfix = "M"
+  } else if (magnitude >= 3) {
+    magnitude -= 3
+    postfix = "k"
+  }
+  var first_digit = String(x).charAt(0);
+  var rounded_significant = first_digit >= 5 ? 5 : 1;
+  return String(rounded_significant * Math.pow(10, magnitude)) + postfix + "+"
+}
 
 // attach Slapp to express server
-var server = slapp.attachToExpress(express())
-
+var server = slapp.attachToExpress(app)
 // start http server
 server.listen(port, (err) => {
   if (err) {
