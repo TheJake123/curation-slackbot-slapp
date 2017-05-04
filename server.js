@@ -179,8 +179,8 @@ app.post('/recommendations',
 	        ]
     }
     if (req.body.host) {
-      attachment.author_name = req.body.host
-        attachment.author_link = req.body.host
+      attachment.author_name = req.body.host;
+      attachment.author_link = `http://${req.body.host}`;
     }
     if (req.body.summary) {
         attachment.text = req.body.summary
@@ -195,18 +195,24 @@ app.post('/recommendations',
     // Populating fields
     var fields = []
     if (req.body.keywords) {
-      fields.push({
-        title: "Keywords",
-        short: false,
-        value: req.body.keywords
-      })
+    	if (!req.body.keywords.includes(", ")) {
+    		req.body.keywords = req.body.keywords.replace(",", ", ")
+    	}
+	    fields.push({
+	    	title: "Keywords",
+	    	short: false,
+	    	value: req.body.keywords
+	    })
     }
     if (req.body.companies) {
-      fields.push({
-        title: "Companies",
-        short: false,
-        value: req.body.companies
-      })
+    	if (!req.body.companies.includes(", ")) {
+    		req.body.companies = req.body.companies.replace(",", ", ")
+    	}
+	    fields.push({
+	        title: "Companies",
+	        short: false,
+	        value: req.body.companies
+	    })
     }
     if (req.body.word_count) {
       fields.push({
@@ -278,7 +284,7 @@ slapp.action('share', 'post', (msg, value) => {
 			var attachment = {
 				color: '#006600',
 				text: `${url}
-					:postbox: Article posted to channel ${value} by <@${userId}>`
+				:postbox: Article posted to channel ${value} by <@${userId}>`
 			}
 			originalMsg.attachments = [originalattachment]
 			msg.respond(msg.body.response_url, originalMsg)
@@ -331,7 +337,7 @@ slapp.action('share', 'discard', (msg, value) => {
 	var attachment = {
 		color: '#800000',
 		text: `${url}
-			:no_entry: Article discarded by <@${userId}>`,
+		:no_entry: Article discarded by <@${userId}>`,
 	} 
 	originalMsg.attachments = [attachment]
 	msg.respond(msg.body.response_url, originalMsg)
