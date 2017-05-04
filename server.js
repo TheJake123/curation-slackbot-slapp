@@ -123,11 +123,11 @@ app.post('/recommendations',
         value: req.body.word_count
       })
     }
-    if (req.body.engagement) {
+    if (req.body.shares) {
       fields.push({
         title: "Shares",
         short: true,
-        value: formatCount(req.body.engagement)
+        value: formatCount(req.body.shares)
       })
     }
     if (req.body.sentiment) {
@@ -175,7 +175,7 @@ slapp.action('share', 'post', (msg, value) => {
 		})
 		.catch((err) => {
 			var lastAttachment = {
-					pretext: ':exclamation: Error posting article to channel'
+					pretext: `:exclamation: Error posting article to channel ${value}`
 			}
 			originalMsg.attachments = [chosenAttachment, lastAttachment]
 			msg.respond(msg.body.response_url, originalMsg)
