@@ -291,7 +291,7 @@ slapp.action('share', 'post', (msg, value) => {
 			var attachment = {
 				color: '#006600',
 				text: `${url}
-				:postbox: Article posted to channel ${value} by <@${userId}>`
+:postbox: Article posted to channel ${value} by <@${userId}>`
 			}
 			originalMsg.attachments = [originalattachment]
 			msg.respond(msg.body.response_url, originalMsg)
@@ -344,7 +344,7 @@ slapp.action('share', 'discard', (msg, value) => {
 	var attachment = {
 		color: '#800000',
 		text: `${url}
-		:no_entry: Article discarded by <@${userId}>`,
+:no_entry: Article discarded by <@${userId}>`,
 	} 
 	originalMsg.attachments = [attachment]
 	msg.respond(msg.body.response_url, originalMsg)
