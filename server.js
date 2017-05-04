@@ -95,83 +95,83 @@ app.post('/recommendations',
         			      "value":76
         			   },
         			   {  
-        			      "text":"Market Trends",
+        			      "text":"82 - Market Trends",
         			      "value":82
         			   },
         			   {  
-        			      "text":"9x Awesome Content",
+        			      "text":"83 - 9x Awesome Content",
         			      "value":83
         			   },
         			   {  
-        			      "text":"Business Practices",
+        			      "text":"84 - Business Practices",
         			      "value":84
         			   },
         			   {  
-        			      "text":"Education Market",
+        			      "text":"86 - Education Market",
         			      "value":86
         			   },
         			   {  
-        			      "text":"Venture Capital & Startups",
+        			      "text":"87 - Venture Capital & Startups",
         			      "value":87
         			   },
         			   {  
-        			      "text":"Fintech",
+        			      "text":"89 - Fintech",
         			      "value":89
         			   },
         			   {  
-        			      "text":"Direct Marketing",
+        			      "text":"101 - Direct Marketing",
         			      "value":101
         			   },
         			   {  
-        			      "text":"IT Business",
+        			      "text":"109 - IT Business",
         			      "value":109
         			   },
         			   {  
-        			      "text":"NN Algemeen",
+        			      "text":"116 - NN Algemeen",
         			      "value":116
         			   },
         			   {  
-        			      "text":"Customer Insights",
+        			      "text":"120 - Customer Insights",
         			      "value":120
         			   },
         			   {  
-        			      "text":"CPS",
+        			      "text":"125 - CPS",
         			      "value":125
         			   },
         			   {  
-        			      "text":"RMS",
+        			      "text":"126 - RMS",
         			      "value":126
         			   },
         			   {  
-        			      "text":"IBM in the Media",
+        			      "text":"136 - IBM in the Media",
         			      "value":136
         			   },
         			   {  
-        			      "text":"Randstad in the News",
+        			      "text":"151 - Randstad in the News",
         			      "value":151
         			   },
         			   {  
-        			      "text":"Randstad Market Watch",
+        			      "text":"152 - Randstad Market Watch",
         			      "value":152
         			   },
         			   {  
-        			      "text":"IBM Cloud Market Watch",
+        			      "text":"170 - IBM Cloud Market Watch",
         			      "value":170
         			   },
         			   {  
-        			      "text":"IBM Developer Advocates",
+        			      "text":"219 - IBM Developer Advocates",
         			      "value":219
         			   },
         			   {  
-        			      "text":"Achmea Transport",
+        			      "text":"250 - Achmea Transport",
         			      "value":250
         			   },
         			   {  
-        			      "text":"Achmea Automotive",
+        			      "text":"251 - Achmea Automotive",
         			      "value":251
         			   },
         			   {  
-        			      "text":"Achmea Innovation",
+        			      "text":"253 - Achmea Innovation",
         			      "value":253
         			   }
         			]
@@ -286,6 +286,7 @@ slapp.action('share', 'post', (msg, value) => {
 	var url = msg.body.original_message.attachments[0].title_link
 	var userId = msg.body.user.id
     var originalMsg = msg.body.original_message;
+	var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1]
 	addUrlToChannel(value, url)
 		.then(() => {
 			var attachment = {
@@ -293,7 +294,7 @@ slapp.action('share', 'post', (msg, value) => {
 				text: `${url}
 :postbox: Article posted to channel ${value} by <@${userId}>`
 			}
-			originalMsg.attachments = [originalattachment]
+			originalMsg.attachments = [chosenAttachment]
 			msg.respond(msg.body.response_url, originalMsg)
 		})
 		.catch((err) => {
