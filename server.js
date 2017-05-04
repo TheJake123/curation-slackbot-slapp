@@ -71,27 +71,27 @@ app.post('/recommendations',
                   "type": "select",
                   "options": [
             		   {  
-            		      "text":"Test",
+            		      "text":"1 - Test",
             		      "value":1
             		   },
             		   {  
-        			     "text":"Digital Marketing",
+        			     "text":"7 - Digital Marketing",
         			     "value":7
         			   },
         			   {  
-        			      "text":"Legal",
+        			      "text":"40 - Legal",
         			      "value":40
         			   },
         			   {  
-        			      "text":"Innovation & Startups",
+        			      "text":"43 - Innovation & Startups",
         			      "value":43
         			   },
         			   {  
-        			      "text":"Journalism",
+        			      "text":"66 - Journalism",
         			      "value":66
         			   },
         			   {  
-        			      "text":"Ondernemen",
+        			      "text":"76 - Ondernemen",
         			      "value":76
         			   },
         			   {  
