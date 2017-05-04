@@ -8,6 +8,7 @@ const bodyParser = require('body-parser')
 const parameters = require('parameters-middleware');
 var request = require('request')
 const slackey = require('slackey')
+
 // use `PORT` env var on Beep Boop - default to 3000 locally
 var port = process.env.PORT || 3000
 var channels = {}
@@ -294,16 +295,23 @@ function addUrlToChannel(channelId, url) {
 		request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/item/add/url',
 			{body: url}, (err, res, body) => {
 				if (err) return reject(err);
-				console.log(`Array: ${body instanceof Array}`);
-				console.log(`Object: ${body instanceof Object}`);
-				if (!(body instanceof Array) && "success" in body && !body.success) return reject(JSON.stringify(body));
+				try {
+					JSON.parse(body)[0]
+				} catch (err) {
+					return reject(JSON.stringify(body))
+				}
 				request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add',
 	    			{ json: {
 	    				channel_id: channelId,
 	    				url: url
 	    			}}, (err2, res2, body2) => {
 	    				if (err) return reject(err);
-	    				if ("success" in body && !body.success) return reject(JSON.stringify(body));
+	    				try {
+	    					var success = JSON.parse(body).success
+	    					if (!success) return reject(JSON.stringify(body));
+	    				} catch (err) {
+	    					return reject(JSON.stringify(body));
+	    				}
 	    				resolve();
 			})
 		})
