@@ -269,19 +269,18 @@ slapp.action('share', 'post', (msg, value) => {
 	var url = msg.body.original_message.attachments[0].title_link
     console.log(`Article ${url} shared to channel ${value}`)
     var originalMsg = msg.body.original_message;
-	var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1];
 	addUrlToChannel(value, url)
 		.then(() => {
-			chosenAttachment.actions = []
-			var lastAttachment = {
-					pretext: `:postbox: Article posted to channel ${value}`
+			attachment = {
+				color: '#800000',
+				text: url + "/n:postbox: Article posted to channel ${value}"
 			}
-			originalMsg.text = url
-			originalMsg.attachments = [lastAttachment]
+			originalMsg.attachments = [attachment]
 			msg.respond(msg.body.response_url, originalMsg)
 		})
 		.catch((err) => {
 			console.log(err)
+			chosenAttachment.color = '#ff9933'
 			var lastAttachment = {
 					pretext: `:exclamation: Error posting article to channel ${value}`
 			}
@@ -323,11 +322,11 @@ slapp.action('share', 'discard', (msg, value) => {
 	var url = msg.body.original_message.attachments[0].title_link
 	var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1]
     chosenAttachment.actions = []
-	var lastAttachment = {
-		pretext: `:no_entry: Article discarded`,
+	var attachment = {
+		color: '#800000',
+		text: url + "\n:no_entry: Article discarded",
 	} 
-	originalMsg.text = url
-	originalMsg.attachments = [lastAttachment]
+	originalMsg.attachments = [attachment]
 	msg.respond(msg.body.response_url, originalMsg)
 })
 
