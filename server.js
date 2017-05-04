@@ -44,7 +44,7 @@ app.post('/recommendations',
     var channelId = req.body.channel
     var channel = channels[channelId]
     if (channel == null) return res.status(400).send("Channel not found")
-    var verifiedIcon = req.body.verified ? "http://smallbusiness.support/wp-content/uploads/2015/10/facebook-verified.png" : "https://cdn1.iconfinder.com/data/icons/rounded-flat-country-flag-collection-1/2000/_Unknown.png"
+    var verifiedIcon = req.body.verified ? "https://cdn3.iconfinder.com/data/icons/basicolor-arrows-checks/24/154_check_ok_sticker_success-512.png" : "http://www.clker.com/cliparts/H/Z/0/R/f/S/warning-icon-hi.png"
     var attachment = {
     	callback_id: "share",
 	      author_icon: verifiedIcon,
@@ -265,17 +265,22 @@ app.post('/recommendations',
 )
 
 slapp.action('share', 'post', (msg, value) => {
-	if (!value) value = msg.body.actions[0].selected_options[0].value
+	var sharedInChannel = true
+	if (!value) {
+		sharedInChannel = false
+		value = msg.body.actions[0].selected_options[0].value
+	}
 	var url = msg.body.original_message.attachments[0].title_link
-    console.log(`Article ${url} shared to channel ${value}`)
+	var userId = msg.body.user.id
     var originalMsg = msg.body.original_message;
 	addUrlToChannel(value, url)
 		.then(() => {
 			var attachment = {
 				color: '#006600',
-				text: url + `/n:postbox: Article posted to channel ${value}`
+				text: `${url}
+					:postbox: Article posted to channel ${value} by <@${userId}>`
 			}
-			originalMsg.attachments = [attachment]
+			originalMsg.attachments = [originalattachment]
 			msg.respond(msg.body.response_url, originalMsg)
 		})
 		.catch((err) => {
@@ -320,11 +325,13 @@ function addUrlToChannel(channelId, url) {
 slapp.action('share', 'discard', (msg, value) => {
 	var originalMsg = msg.body.original_message
 	var url = msg.body.original_message.attachments[0].title_link
+	var userId = msg.body.user.id
 	var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1]
     chosenAttachment.actions = []
 	var attachment = {
 		color: '#800000',
-		text: url + "\n:no_entry: Article discarded",
+		text: `${url}
+			:no_entry: Article discarded by <@${userId}>`,
 	} 
 	originalMsg.attachments = [attachment]
 	msg.respond(msg.body.response_url, originalMsg)
