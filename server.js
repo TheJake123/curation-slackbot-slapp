@@ -298,16 +298,16 @@ function addUrlToChannel(channelId, url) {
 				try {
 					JSON.parse(body)[0]
 				} catch (err) {
-					return reject(JSON.stringify(body))
+					return reject(JSON.stringify(body));
 				}
 				request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add',
 	    			{ json: {
 	    				channel_id: channelId,
 	    				url: url
 	    			}}, (err2, res2, body2) => {
-	    				if (err) return reject(err);
+	    				if (err2) return reject(err);
 	    				try {
-	    					var success = JSON.parse(body).success
+	    					var success = body2.success
 	    					if (!success) return reject(JSON.stringify(body));
 	    				} catch (err) {
 	    					return reject(JSON.stringify(body));
