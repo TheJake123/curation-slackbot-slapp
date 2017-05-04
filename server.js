@@ -384,6 +384,7 @@ function formatCount(x) {
 		magnitude -= 6
 		postfix = "M"
 	} else if (magnitude >= 3) {
+		prefix = ":fire: "
 		magnitude -= 3
 		postfix = "k"
 	}
