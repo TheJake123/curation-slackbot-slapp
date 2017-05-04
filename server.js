@@ -229,10 +229,10 @@ app.post('/recommendations',
     			sentiment = ":rage:Negative";
     			break;
     		case "positive":
-    			sentiment = ":blush:Positive";
+    			sentiment = ":smile:Positive";
     			break;
     		case "neutral":
-    			sentiment = "Neutral"
+    			sentiment = ":neutral_face:Neutral"
     			break;
     	}
     	fields.push({
