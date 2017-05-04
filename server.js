@@ -13,7 +13,6 @@ var port = process.env.PORT || 3000
 var channels = {}
 
 var slackAPIClient
-fetchChannels()
 var beepboop = BeepBoop.start()
 
 beepboop.on('open', () => {
@@ -26,9 +25,10 @@ beepboop.on('close', (code, message) => {
   console.log('Connection to Beep Boop was closed')
 })
 beepboop.on('add_resource', (message) => {
-  console.log('Team added: ', message)
-  console.log(message.resource.SlackBotAccessToken)
+  console.log('Team added: ', message);
+  console.log(message.resource.SlackBotAccessToken);
   slackAPIClient = slackey.getAPIClient(message.resource.SlackBotAccessToken);
+	fetchChannels();
 })
 var slapp = Slapp({
   // Beep Boop sets the SLACK_VERIFY_TOKEN env var
@@ -39,9 +39,9 @@ var slapp = Slapp({
 var app = express()
 app.use(bodyParser.json());
 app.post('/recommendations',
-  parameters({body : ["channel_id", "title", "url"]}),
+  parameters({body : ["channel", "title", "url"]}),
   (req, res) => {
-    var channelId = req.body.channelId
+    var channelId = req.body.channel
     var channel = '#general'//channels[channelId]
     if (channel == null) return res.status(400).send("Channel not found")
     var verifiedIcon = req.body.verified ? "http://smallbusiness.support/wp-content/uploads/2015/10/facebook-verified.png" : "https://cdn1.iconfinder.com/data/icons/rounded-flat-country-flag-collection-1/2000/_Unknown.png"
