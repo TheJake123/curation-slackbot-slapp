@@ -271,7 +271,7 @@ slapp.action('share', 'post', (msg, value) => {
     var originalMsg = msg.body.original_message;
 	addUrlToChannel(value, url)
 		.then(() => {
-			attachment = {
+			var attachment = {
 				color: '#800000',
 				text: url + "/n:postbox: Article posted to channel ${value}"
 			}
