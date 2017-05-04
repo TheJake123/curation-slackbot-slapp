@@ -294,7 +294,11 @@ slapp.action('share', 'post', (msg, value) => {
 				text: `${url}
 :postbox: Article posted to channel ${value} by <@${userId}>`
 			}
-			originalMsg.attachments = [chosenAttachment]
+			originalMsg.attachments = []
+			if (!sharedInChannel) {
+				originalMsg.attachments.push(chosenAttachment)
+			}
+			originalMsg.attachments.push(attachment)
 			msg.respond(msg.body.response_url, originalMsg)
 		})
 		.catch((err) => {
