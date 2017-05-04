@@ -196,7 +196,7 @@ app.post('/recommendations',
     var fields = []
     if (req.body.keywords) {
     	if (!req.body.keywords.includes(", ")) {
-    		req.body.keywords = req.body.keywords.replace(",", ", ")
+    		req.body.keywords = req.body.keywords.replace(/,/g, ", ")
     	}
 	    fields.push({
 	    	title: "Keywords",
@@ -206,7 +206,7 @@ app.post('/recommendations',
     }
     if (req.body.companies) {
     	if (!req.body.companies.includes(", ")) {
-    		req.body.companies = req.body.companies.replace(",", ", ")
+    		req.body.companies = req.body.companies.replace(/,/g, ", ")
     	}
 	    fields.push({
 	        title: "Companies",
@@ -215,11 +215,17 @@ app.post('/recommendations',
 	    })
     }
     if (req.body.word_count) {
-      fields.push({
-        title: "Length",
-        short: true,
-        value: req.body.word_count + " words"
-      })
+    	var length = req.body.word_count
+    	var prefix = ""
+    	if (length > 1000 )
+    		prefix = ":snail: "
+    	else if (length < 300)
+    		prefix = ":fast_forward: "
+    	fields.push({
+    		title: "Length",
+    		short: true,
+    		value: `${prefix}${length} words`
+    	})
     }
     if (req.body.shares) {
       fields.push({
@@ -232,13 +238,13 @@ app.post('/recommendations',
     	var sentiment
     	switch (req.body.sentiment) {
     		case "negative":
-    			sentiment = ":rage:Negative";
+    			sentiment = ":rage: Negative";
     			break;
     		case "positive":
-    			sentiment = ":smile:Positive";
+    			sentiment = ":smile: Positive";
     			break;
     		case "neutral":
-    			sentiment = ":neutral_face:Neutral"
+    			sentiment = "Neutral"
     			break;
     	}
     	fields.push({
@@ -247,11 +253,12 @@ app.post('/recommendations',
             value: sentiment
           })
     }
-    fields.push({
-    	"title": "Sponsored",
-        "value": ":warning: Undetected",
-        "short": true
-    })
+//    Unsupported for now
+//    fields.push({
+//    	"title": "Sponsored",
+//        "value": ":warning: Undetected",
+//        "short": true
+//    })
     attachment.fields = fields
     slackAPIClient.send('chat.postMessage',
           {
@@ -364,18 +371,20 @@ function fetchChannels() {
 }
 
 function formatCount(x) {
-  var magnitude = Math.max(Math.floor(Math.log10(Math.abs(x))), 0);
-  var postfix = ""
-  if (magnitude >= 6) {
-    magnitude -= 6
-    postfix = "M"
-  } else if (magnitude >= 3) {
-    magnitude -= 3
-    postfix = "k"
-  }
-  var first_digit = String(x).charAt(0);
-  var rounded_significant = first_digit >= 5 ? 5 : 1;
-  return String(rounded_significant * Math.pow(10, magnitude)) + postfix + "+"
+	var magnitude = Math.max(Math.floor(Math.log10(Math.abs(x))), 0);
+	var postfix = ""
+	var prefix = ""
+	if (magnitude >= 6) {
+		prefix = ":fire: "
+		magnitude -= 6
+		postfix = "M"
+	} else if (magnitude >= 3) {
+		magnitude -= 3
+		postfix = "k"
+	}
+	var first_digit = String(x).charAt(0);
+	var rounded_significant = first_digit >= 5 ? 5 : 1;
+	return `${prefix}${rounded_significant * Math.pow(10, magnitude)}${postfix}+`
 }
 
 // attach Slapp to express server
