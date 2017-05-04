@@ -223,6 +223,18 @@ app.post('/recommendations',
       })
     }
     if (req.body.sentiment) {
+    	var sentiment
+    	switch (req.body.sentiment) {
+    		case "negative":
+    			sentiment = ":rage:Negative";
+    			break;
+    		case "positive":
+    			sentiment = ":blush:Positive";
+    			break;
+    		case "neutral":
+    			sentiment = "Neutral"
+    			break;
+    	}
     	fields.push({
             title: "Sentiment",
             short: true,
