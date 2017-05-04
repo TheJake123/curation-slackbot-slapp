@@ -253,7 +253,7 @@ app.post('/recommendations',
 )
 
 slapp.action('share', 'post', (msg, value) => {
-	if (!value) value = msg.body.actions.selected_options[0].value
+	if (!value) value = msg.body.actions[0].selected_options[0].value
     console.log(`Article ${msg.body.original_message.attachments[0].title_link} shared to channel ${value}`)
     var originalMsg = msg.body.original_message;
 	var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1];
@@ -281,14 +281,14 @@ function addUrlToChannel(channelId, url) {
 		request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/item/add/url',
 			{body: url}, (err, res, body) => {
 				if (err) return reject(err);
-				if (!body.success) return reject(JSON.stringify(body));
+				if ("success" in body && !body.success) return reject(JSON.stringify(body));
 				request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add',
 	    			{ json: {
 	    				channel_id: channelId,
 	    				url: url
 	    			}}, (err2, res2, body2) => {
 	    				if (err) return reject(err);
-	    				if (!body.success) return reject(JSON.stringify(body));
+	    				if ("success" in body && !body.success) return reject(JSON.stringify(body));
 	    				resolve();
 			})
 		})
