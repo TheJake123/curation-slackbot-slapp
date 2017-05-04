@@ -174,6 +174,7 @@ slapp.action('share', 'post', (msg, value) => {
 			msg.respond(msg.body.response_url, originalMsg)
 		})
 		.catch((err) => {
+			console.log(err)
 			var lastAttachment = {
 					pretext: `:exclamation: Error posting article to channel ${value}`
 			}
