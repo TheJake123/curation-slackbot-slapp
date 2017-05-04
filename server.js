@@ -279,9 +279,7 @@ slapp.action('share', 'post', (msg, value) => {
 function addUrlToChannel(channelId, url) {
 	return new Promise((resolve, reject) => {
 		request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/item/add/url',
-			{ json: {
-				url: url
-			}}, (err, res, body) => {
+			{body: url}, (err, res, body) => {
 				if (err) return reject(err);
 				if (!body.success) return reject(JSON.stringify(body));
 				request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add',
