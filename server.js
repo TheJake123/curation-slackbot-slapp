@@ -212,7 +212,7 @@ app.post('/recommendations',
       fields.push({
         title: "Length",
         short: true,
-        value: req.body.word_count
+        value: req.body.word_count + " words"
       })
     }
     if (req.body.shares) {
@@ -238,7 +238,7 @@ app.post('/recommendations',
     	fields.push({
             title: "Sentiment",
             short: true,
-            value: req.body.sentiment
+            value: sentiment
           })
     }
     fields.push({
@@ -293,7 +293,7 @@ function addUrlToChannel(channelId, url) {
 		request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/item/add/url',
 			{body: url}, (err, res, body) => {
 				if (err) return reject(err);
-				if ("success" in body && !body.success) return reject(JSON.stringify(body));
+				if (!(body instanceof Array) && "success" in body && !body.success) return reject(JSON.stringify(body));
 				request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add',
 	    			{ json: {
 	    				channel_id: channelId,
