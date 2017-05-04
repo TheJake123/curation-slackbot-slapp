@@ -190,8 +190,7 @@ app.post('/recommendations',
         attachment.image_url = req.body.image_url
     }
     if (req.body.pub_date) {
-    	console.log(Date.parse(req.body.pub_date))
-        attachment.ts = Date.parse(req.body.pub_date)
+        attachment.ts = Date.parse(req.body.pub_date) / 1000
     }
     
     // Populating fields
