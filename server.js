@@ -64,7 +64,26 @@ app.post('/recommendations',
 	            "type": "button",
 	            "style": "danger",
 	            "value": "discarded"
-	          }
+	          },
+	          {
+                  "name": "post",
+                  "text": "Share to channel...",
+                  "type": "select",
+                  "options": [
+                	   {  
+            		      "text":"second",
+            		      "value":5
+            		   },
+            		   {  
+            		      "text":"test",
+            		      "value":6
+            		   },
+            		   {  
+            		      "text":"Test",
+            		      "value":1
+            		   }
+                  ]
+              }
 	        ]
     }
     if (req.body.host) {
@@ -88,9 +107,6 @@ app.post('/recommendations',
         title: "Keywords",
         short: false,
         value: req.body.keywords
-          .map(elem => {
-              return elem.keyword;
-          }).join(", ")
       })
     }
     if (req.body.companies) {
@@ -98,9 +114,6 @@ app.post('/recommendations',
         title: "Companies",
         short: false,
         value: req.body.companies
-          .map(elem => {
-              return elem.text;
-          }).join(", ")
       })
     }
     if (req.body.word_count) {
@@ -135,14 +148,13 @@ app.post('/recommendations',
           channel,
           attachments: [attachment]
           },
-          function(err, response) {
-          if (err) {
-            console.log(err)
-            res.status(500).send(err)
-          } else {
-            res.status(201).send(response)
-          }
-
+          (err, response) => {
+	          if (err) {
+	            console.log(err)
+	            res.status(500).send(err)
+	          } else {
+	            res.status(201).send(response)
+	          }
           }
         )
   }
@@ -150,22 +162,46 @@ app.post('/recommendations',
 
 slapp.action('share', 'post', (msg, value) => {
     console.log(`Article ${msg.body.original_message.attachments[0].title_link} shared to channel ${value}`)
-    request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/item/add/url',
-    			{ json: {
-    				url: value
-    			}}, (err, res, body) => {
-    				if (err) console.log(err)
-    				var originalMsg = msg.body.original_message
-					var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1]
-				    chosenAttachment.actions = []
-					var lastAttachment = {
-						pretext: JSON.stringify(body)//`:postbox: Article posted to channel ${value}`,
-					} 
-					originalMsg.attachments = [chosenAttachment, lastAttachment]
-					msg.respond(msg.body.response_url, originalMsg)
-    			})
-	
+    var originalMsg = msg.body.original_message;
+	var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1];
+	addUrlToChannel(value, msg.body.original_message.attachments[0].title_link)
+		.then(() => {
+			chosenAttachment.actions = []
+			var lastAttachment = {
+					pretext: `:postbox: Article posted to channel ${value}`
+			}
+			originalMsg.attachments = [chosenAttachment, lastAttachment]
+			msg.respond(msg.body.response_url, originalMsg)
+		})
+		.catch((err) => {
+			var lastAttachment = {
+					pretext: ':exclamation: Error posting article to channel'
+			}
+			originalMsg.attachments = [chosenAttachment, lastAttachment]
+			msg.respond(msg.body.response_url, originalMsg)
+		})	
 })
+
+function addUrlToChannel(channelId, url) {
+	return new Promise((resolve, reject) => {
+		request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/item/add/url',
+			{ json: {
+				url: url
+			}}, (err, res, body) => {
+				if (err) return reject(err);
+				if (!body.success) return reject(JSON.stringify(body));
+				request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add',
+	    			{ json: {
+	    				channel_id: channelId,
+	    				url: url
+	    			}}, (err2, res2, body2) => {
+	    				if (err) return reject(err);
+	    				if (!body.success) return reject(JSON.stringify(body));
+	    				resolve();
+			})
+		})
+	})
+}
 
 slapp.action('share', 'discard', (msg, value) => {
 	var originalMsg = msg.body.original_message
