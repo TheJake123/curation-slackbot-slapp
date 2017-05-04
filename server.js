@@ -189,6 +189,7 @@ app.post('/recommendations',
         attachment.image_url = req.body.image_url
     }
     if (req.body.pub_date) {
+    	console.log(Date.parse(req.body.pub_date))
         attachment.ts = Date.parse(req.body.pub_date)
     }
     
@@ -293,6 +294,8 @@ function addUrlToChannel(channelId, url) {
 		request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/item/add/url',
 			{body: url}, (err, res, body) => {
 				if (err) return reject(err);
+				console.log(`Array: ${body instanceof Array}`);
+				console.log(`Object: ${body instanceof Object}`);
 				if (!(body instanceof Array) && "success" in body && !body.success) return reject(JSON.stringify(body));
 				request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add',
 	    			{ json: {
