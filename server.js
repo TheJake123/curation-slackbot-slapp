@@ -267,16 +267,18 @@ app.post('/recommendations',
 
 slapp.action('share', 'post', (msg, value) => {
 	if (!value) value = msg.body.actions[0].selected_options[0].value
-    console.log(`Article ${msg.body.original_message.attachments[0].title_link} shared to channel ${value}`)
+	var url = msg.body.original_message.attachments[0].title_link
+    console.log(`Article ${url} shared to channel ${value}`)
     var originalMsg = msg.body.original_message;
 	var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1];
-	addUrlToChannel(value, msg.body.original_message.attachments[0].title_link)
+	addUrlToChannel(value, url)
 		.then(() => {
 			chosenAttachment.actions = []
 			var lastAttachment = {
 					pretext: `:postbox: Article posted to channel ${value}`
 			}
-			originalMsg.attachments = [chosenAttachment, lastAttachment]
+			originalMsg.text = url
+			originalMsg.attachments = [lastAttachment]
 			msg.respond(msg.body.response_url, originalMsg)
 		})
 		.catch((err) => {
