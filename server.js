@@ -26,8 +26,7 @@ beepboop.on('close', (code, message) => {
   console.log('Connection to Beep Boop was closed')
 })
 beepboop.on('add_resource', (message) => {
-  console.log('Team added: ', message);
-  console.log(message.resource.SlackBotAccessToken);
+  console.log('Team added: ', message.resource.SlackTeamName);
   slackAPIClient = slackey.getAPIClient(message.resource.SlackBotAccessToken);
 	fetchChannels();
 })
@@ -321,12 +320,14 @@ function addUrlToChannel(channelId, url) {
 
 slapp.action('share', 'discard', (msg, value) => {
 	var originalMsg = msg.body.original_message
+	var url = msg.body.original_message.attachments[0].title_link
 	var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1]
     chosenAttachment.actions = []
 	var lastAttachment = {
 		pretext: `:no_entry: Article discarded`,
 	} 
-	originalMsg.attachments = [chosenAttachment, lastAttachment]
+	originalMsg.text = url
+	originalMsg.attachments = [lastAttachment]
 	msg.respond(msg.body.response_url, originalMsg)
 })
 
