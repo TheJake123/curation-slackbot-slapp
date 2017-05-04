@@ -12,7 +12,7 @@ const slackey = require('slackey')
 var port = process.env.PORT || 3000
 var channels = {}
 
-var slackAPIClient
+var slackAPIClient 
 var beepboop = BeepBoop.start()
 
 beepboop.on('open', () => {
@@ -149,7 +149,15 @@ app.post('/recommendations',
 )
 
 slapp.action('share', 'post', (msg, value) => {
-    console.log(`Article ${msg.attachments[0].title_link} shared to channel ${value}`)
+    console.log(`Article ${msg.body.original_message.attachments[0].title_link} shared to channel ${value}`)
+	var originalMsg = msg.body.original_message
+	var chosenAttachment = originalMsg.attachments[msg.body.attachment_id - 1]
+    chosenAttachment.actions = []
+	var lastAttachment = {
+		pretext: `:postbox: Article posted to channel ${value}`,
+	} 
+	originalMsg.attachments = [chosenAttachment, lastAttachment]
+	msg.respond(msg.body.response_url, originalMsg)
 })
 
 function fetchChannels() {
