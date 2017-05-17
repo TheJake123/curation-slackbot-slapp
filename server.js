@@ -319,7 +319,7 @@ function addUrlToChannel(channelId, url) {
 				if (err) return reject(err);
 				try {
 					JSON.parse(body)[0]
-					console.log(`Successfully created item ${url}: ${JSON.parse(body)}`)
+					console.log(`Successfully created item ${url}: ${body}`)
 				} catch (err) {
 					return reject(err + JSON.stringify(body));
 				}
