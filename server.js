@@ -267,7 +267,7 @@ app.post('/recommendations',
           },
           (err, response) => {
 	          if (err) {
-	            console.err(err)
+	            console.log(err)
 	            res.status(500).send(err)
 	          } else {
 	            res.status(201).send(response)
@@ -302,7 +302,7 @@ slapp.action('share', 'post', (msg, value) => {
 			msg.respond(msg.body.response_url, originalMsg)
 		})
 		.catch((err) => {
-			console.err(err)
+			console.log(err)
 			chosenAttachment.color = '#ff9933'
 			var lastAttachment = {
 					pretext: `:exclamation: Error posting article to channel ${value}`
@@ -358,7 +358,7 @@ slapp.action('share', 'discard', (msg, value) => {
 function fetchChannels() {
   slackAPIClient.send('channels.list',
       function(err, response) {
-        if (err) console.err(err)
+        if (err) console.log(err)
           for (var i = 0; i < response.channels.length; i++) {
             var channel = response.channels[i]
             try {
@@ -367,7 +367,7 @@ function fetchChannels() {
                 channels[channelNumber] = channel.id
               }
             } catch (err) {
-              console.err(err)
+              console.log(err)
             }
           }
         console.log(`${Object.keys(channels).length} channels loaded`)
@@ -398,7 +398,7 @@ var server = slapp.attachToExpress(app)
 // start http server
 server.listen(port, (err) => {
   if (err) {
-    return console.error(err)
+    return console.log(err)
   }
 
   console.log(`Listening on port ${port}`)
