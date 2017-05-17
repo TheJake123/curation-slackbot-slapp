@@ -267,7 +267,7 @@ app.post('/recommendations',
           },
           (err, response) => {
 	          if (err) {
-	            console.log(err)
+	            console.err(err)
 	            res.status(500).send(err)
 	          } else {
 	            res.status(201).send(response)
@@ -302,7 +302,7 @@ slapp.action('share', 'post', (msg, value) => {
 			msg.respond(msg.body.response_url, originalMsg)
 		})
 		.catch((err) => {
-			console.log(err)
+			console.err(err)
 			chosenAttachment.color = '#ff9933'
 			var lastAttachment = {
 					pretext: `:exclamation: Error posting article to channel ${value}`
@@ -320,7 +320,7 @@ function addUrlToChannel(channelId, url) {
 				try {
 					JSON.parse(body)[0]
 				} catch (err) {
-					return reject(JSON.stringify(body));
+					return reject(err + JSON.stringify(body));
 				}
 				request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add',
 	    			{ json: {
@@ -332,7 +332,7 @@ function addUrlToChannel(channelId, url) {
 	    					var success = body2.success
 	    					if (!success) return reject(JSON.stringify(body));
 	    				} catch (err) {
-	    					return reject(JSON.stringify(body));
+	    					return reject(err + JSON.stringify(body));
 	    				}
 	    				resolve();
 			})
@@ -358,7 +358,7 @@ slapp.action('share', 'discard', (msg, value) => {
 function fetchChannels() {
   slackAPIClient.send('channels.list',
       function(err, response) {
-        if (err) console.log(err)
+        if (err) console.err(err)
           for (var i = 0; i < response.channels.length; i++) {
             var channel = response.channels[i]
             try {
@@ -367,7 +367,7 @@ function fetchChannels() {
                 channels[channelNumber] = channel.id
               }
             } catch (err) {
-              console.log(err)
+              console.err(err)
             }
           }
         console.log(`${Object.keys(channels).length} channels loaded`)
