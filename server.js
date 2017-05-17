@@ -322,12 +322,20 @@ function addUrlToChannel(channelId, url) {
 				} catch (err) {
 					return reject(err + JSON.stringify(body));
 				}
-				request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add',
-	    			{ json: {
+				var payload = {
 	    				channel_id: channelId,
 	    				url: url
-	    			}}, (err2, res2, body2) => {
+	    			}
+				request.post('http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add',
+	    			{ json: payload}, (err2, res2, body2) => {
 	    				if (err2) return reject(err);
+	    				try {
+	    					var success = body2.success
+	    					if (!success) return reject(`Error posting to http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add with body ${payload}
+Got back ${JSON.stringify(body2)}`);
+	    				} catch (err) {
+	    					return reject(err + JSON.stringify(body));
+	    				}
 	    				resolve();
 			})
 		})
