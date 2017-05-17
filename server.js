@@ -319,6 +319,7 @@ function addUrlToChannel(channelId, url) {
 				if (err) return reject(err);
 				try {
 					JSON.parse(body)[0]
+					console.log(`Successfully created item ${url}: ${JSON.parse(body)}`)
 				} catch (err) {
 					return reject(err + JSON.stringify(body));
 				}
@@ -331,7 +332,7 @@ function addUrlToChannel(channelId, url) {
 	    				if (err2) return reject(err);
 	    				try {
 	    					var success = body2.success
-	    					if (!success) return reject(`Error posting to http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add with body ${payload}
+	    					if (!success) return reject(`Error posting to http://itao-server-55663464.eu-central-1.elb.amazonaws.com/itao/channel/item/add with body ${JSON.stringify(payload)}
 Got back ${JSON.stringify(body2)}`);
 	    				} catch (err) {
 	    					return reject(err + JSON.stringify(body));
