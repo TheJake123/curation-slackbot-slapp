@@ -330,7 +330,7 @@ function addUrlToChannel(channelId, url) {
 	    				if (err2) return reject(err);
 	    				try {
 	    					var success = body2.success
-	    					if (!success) return reject(JSON.stringify(body));
+	    					if (!success) return reject("No success" + JSON.stringify(body));
 	    				} catch (err) {
 	    					return reject(err + JSON.stringify(body));
 	    				}
