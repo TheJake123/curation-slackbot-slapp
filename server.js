@@ -8,13 +8,14 @@ const bodyParser = require('body-parser')
 const parameters = require('parameters-middleware');
 var request = require('request')
 const slackey = require('slackey')
-
+var NcClient = require('NcClient')
 // use `PORT` env var on Beep Boop - default to 3000 locally
 var port = process.env.PORT || 3000
 var channels = {}
 
 var slackAPIClient
 var beepboop = BeepBoop.start()
+var ncClient = new NcClient(process.env.DB_HOST)
 
 beepboop.on('open', () => {
   console.log('connection to Beep Boop server opened')
@@ -298,13 +299,13 @@ slapp.command('/feeds', 'sources', (msg, text) => {
 })
 
 slapp.command('/feeds', 'help', (msg, text) => {
-	msg.respond(`Valid commands: list, connect, create, add, sources, help.
-	To show the currently connected feed: /feeds
-	To list all available feeds: /feeds list
-	To connect a feed to this channel: /feeds connect <id> (Take ID from /feeds list)
-	To create and connect a new feed: /feeds create <name>
-	To add a source to the connected feed: /feeds add <url>
-	To list the sources in the connected feed: /feeds sources`)
+	msg.respond(`Valid commands: \`list\`, \`connect\`, \`create\`, \`add\`, \`sources\`, \`help\`.
+	To show the currently connected feed: \`/feeds\`
+	To list all available feeds: \`/feeds list\`
+	To connect a feed to this channel: \`/feeds connect <id>\` (Take ID from /feeds list)
+	To create and connect a new feed: \`/feeds create <name>\`
+	To add a source to the connected feed: \`/feeds add <url>\`
+	To list the sources in the connected feed: \`/feeds sources\``)
 })
 
 slapp.action('share', 'post', (msg, value) => {
