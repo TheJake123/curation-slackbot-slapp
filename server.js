@@ -277,6 +277,36 @@ app.post('/recommendations',
   }
 )
 
+slapp.command('/feeds', 'list', (msg, text) => {
+	
+})
+
+slapp.command('/feeds', 'connect (\n+)', (msg, text, id) => {
+	
+})
+
+slapp.command('/feeds', 'create (.+)', (msg, text, name) => {
+	
+})
+
+slapp.command('/feeds', 'add (.+)', (msg, text, url) => {
+	
+})
+
+slapp.command('/feeds', 'sources', (msg, text) => {
+	
+})
+
+slapp.command('/feeds', 'help', (msg, text) => {
+	msg.respond(`Valid commands: list, connect, create, add, sources, help.
+	To show the currently connected feed: /feeds
+	To list all available feeds: /feeds list
+	To connect a feed to this channel: /feeds connect <id> (Take ID from /feeds list)
+	To create and connect a new feed: /feeds create <name>
+	To add a source to the connected feed: /feeds add <url>
+	To list the sources in the connected feed: /feeds sources`)
+})
+
 slapp.action('share', 'post', (msg, value) => {
 	var sharedInChannel = true
 	if (!value) {
