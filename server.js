@@ -6,8 +6,8 @@ const Context = require('slapp-context-beepboop')
 const BeepBoop = require('beepboop')
 const bodyParser = require('body-parser')
 const parameters = require('parameters-middleware');
-var request = require('request')
 const slackey = require('slackey')
+var request = require('request')
 var NcClient = require('./NcClient')
 // use `PORT` env var on Beep Boop - default to 3000 locally
 var port = process.env.PORT || 3000
@@ -279,11 +279,28 @@ app.post('/recommendations',
 )
 
 slapp.command('/feeds', 'list', (msg, text) => {
-	
+	ncClient.list().then (feeds => {
+		var lines = feeds.map(feed => {
+			return `${feed.id}. ${feed.name} (${feed.sources.length} source${feed.sources.length === 1 ? '' : s})`
+		})
+		msg.respond(lines.join("\n"))
+	})
 })
 
 slapp.command('/feeds', 'connect (\n+)', (msg, text, id) => {
-	
+	ncClient.connect().then (feeds => {
+		 slackAPIClient.send('channels.setTopic',
+          {
+			 channel: msg.meta.channel_id,
+			 topic: id
+          },
+          (err, response) => {
+        	  if (err) {
+        		  console.log(err)
+	          }
+          }
+        )
+	})
 })
 
 slapp.command('/feeds', 'create (.+)', (msg, text, name) => {
@@ -304,7 +321,7 @@ slapp.command('/feeds', 'help', (msg, text) => {
 	To list all available feeds: \`/feeds list\`
 	To connect a feed to this channel: \`/feeds connect <id>\` (Take ID from /feeds list)
 	To create and connect a new feed: \`/feeds create <name>\`
-	To add a source to the connected feed: \`/feeds add <url>\`
+	To add an RSS source to the connected feed: \`/feeds add <url>\`
 	To list the sources in the connected feed: \`/feeds sources\``)
 })
 
