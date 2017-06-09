@@ -8,7 +8,7 @@ const bodyParser = require('body-parser')
 const parameters = require('parameters-middleware');
 var request = require('request')
 const slackey = require('slackey')
-var NcClient = require('NcClient')
+var NcClient = require('./NcClient')
 // use `PORT` env var on Beep Boop - default to 3000 locally
 var port = process.env.PORT || 3000
 var channels = {}
