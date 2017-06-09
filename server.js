@@ -281,13 +281,14 @@ app.post('/recommendations',
 slapp.command('/feeds', 'list', (msg, text) => {
 	ncClient.list().then (feeds => {
 		var lines = feeds.map(feed => {
-			return `${feed.id}. ${feed.name} (${feed.sources.length} source${feed.sources.length === 1 ? '' : s})`
+			return `${feed.id}. ${feed.name} (${feed.sources.length} source${feed.sources.length === 1 ? '' : 's'})`
 		})
 		msg.respond(lines.join("\n"))
 	})
 })
 
 slapp.command('/feeds', 'connect (\n+)', (msg, text, id) => {
+	console.log(`Connecting feed ${id}`)
 	ncClient.connect().then (feeds => {
 		 slackAPIClient.send('channels.setTopic',
           {
@@ -298,6 +299,7 @@ slapp.command('/feeds', 'connect (\n+)', (msg, text, id) => {
         	  if (err) {
         		  console.log(err)
 	          }
+        	  msg.respond(`:white_check_mark: Feed ${id} connected to this channel`)
           }
         )
 	})
