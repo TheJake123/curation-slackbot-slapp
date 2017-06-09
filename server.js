@@ -287,7 +287,7 @@ slapp.command('/feeds', 'list', (msg, text) => {
 	})
 })
 
-slapp.command('/feeds', 'connect (\d+)', (msg, text, id) => {
+slapp.command('/feeds', /connect (\d+)/, (msg, text, id) => {
 	console.log(`Connecting feed ${id}`)
 	ncClient.connect().then (feeds => {
 		 slackAPIClient.send('channels.setTopic',
@@ -314,7 +314,7 @@ slapp.command('/feeds', 'create (.+)', (msg, text, name) => {
 		var lines = feeds.map(feed => {
 			return `${feed.id}. ${feed.name} (${feed.sources.length} source${feed.sources.length === 1 ? '' : 's'})`
 		})
-		msg.respond(lines.join("\n"))
+		msg.respond(`:white_check_mark: Successfully created feed ${name}, here is the list of all feeds:\n${lines.join("\n")}`)
 	}).catch(() => {
 		msg.respond("Error creating feed")
 	})
