@@ -1,6 +1,6 @@
 name: Curinator
 description: A Slack bot for recommending articles
 config:
-  - name: 9X_TOKEN
+  - name: NC_TOKEN
     friendly_name: 9X Access Token
     type: secret

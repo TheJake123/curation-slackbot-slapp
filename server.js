@@ -15,7 +15,7 @@ var channels = {}
 
 var slackAPIClient
 var beepboop = BeepBoop.start()
-var ncClient = new NcClient(process.env.DB_HOST)
+var ncClient = new NcClient(process.env.NC_TOKEN)
 
 beepboop.on('open', () => {
   console.log('connection to Beep Boop server opened')
@@ -308,7 +308,18 @@ slapp.command('/feeds', 'create (.+)', (msg, text, name) => {
 })
 
 slapp.command('/feeds', 'add (.+)', (msg, text, url) => {
-	
+	 slackAPIClient.send('channels.info',
+	          {
+				 channel: msg.meta.channel_id,
+	          },
+	          (err, response) => {
+	        	  if (err) {
+	        		  console.log(err)
+		          }
+	        	  var feedId = JSON.parse(response).channel.topic.value
+	        	  msg.respond(feedId)
+	          }
+	        )
 })
 
 slapp.command('/feeds', 'sources', (msg, text) => {
