@@ -29,7 +29,7 @@ beepboop.on('close', (code, message) => {
 beepboop.on('add_resource', (message) => {
   console.log('Team added: ', message.resource.SlackTeamName);
   slackAPIClient = slackey.getAPIClient(message.resource.SlackBotAccessToken);
-	fetchChannels();
+  fetchChannels();
 })
 var slapp = Slapp({
   // Beep Boop sets the SLACK_VERIFY_TOKEN env var
@@ -288,20 +288,7 @@ slapp.command('/feeds', 'list', (msg, text) => {
 })
 
 slapp.command('/feeds', /connect (\d+)/, (msg, text, id) => {
-	 slackAPIClient.send('channels.setTopic',
-      {
-		 channel: msg.meta.channel_id,
-		 topic: id
-      },
-      (err, response) => {
-    	  if (err) {
-    		  console.log(err)
-    		  msg.respond(err.toString())
-    	  } else {
-        	  msg.respond(`:white_check_mark: Feed ${id} connected to this channel`)        		  
-    	  }
-      }
-    )
+	 msg.respond(`To connect a feed to this channel, please just put the id (${id}) as the channel topic (at the top)`)
 })
 
 slapp.command('/feeds', 'create (.+)', (msg, text, name) => {

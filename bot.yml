@@ -7,4 +7,3 @@ config:
 slackscopes:
   - bot
   - commands
-  - channels:write
