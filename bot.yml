@@ -4,3 +4,7 @@ config:
   - name: NC_TOKEN
     friendly_name: 9X Access Token
     type: secret
+slackscopes:
+  - bot
+  - commands
+  - channels.write

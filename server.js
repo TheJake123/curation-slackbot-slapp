@@ -288,7 +288,6 @@ slapp.command('/feeds', 'list', (msg, text) => {
 })
 
 slapp.command('/feeds', /connect (\d+)/, (msg, text, id) => {
-	console.log(`Connecting feed ${id}`)
 	 slackAPIClient.send('channels.setTopic',
       {
 		 channel: msg.meta.channel_id,
