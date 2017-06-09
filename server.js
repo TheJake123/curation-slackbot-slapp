@@ -308,11 +308,9 @@ slapp.command('/feeds', 'connect (\d+)', (msg, text, id) => {
 })
 
 slapp.command('/feeds', 'create (.+)', (msg, text, name) => {
-	getConnectedFeedId(msg.meta.channel_id).then(feedId => {
-		return ncClient.create(feedId, name)
-	}).then(() => {
-		return ncClient.list(feedId)
-	}).then(sources => {
+	ncClient.create(name).then(() => {
+		return ncClient.list()
+	}).then(feeds => {
 		var lines = feeds.map(feed => {
 			return `${feed.id}. ${feed.name} (${feed.sources.length} source${feed.sources.length === 1 ? '' : 's'})`
 		})
