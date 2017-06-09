@@ -360,7 +360,7 @@ slapp.command('/feeds', 'sources', (msg, text) => {
 	})
 })
 
-slapp.command('/feeds', '(help)?', (msg, text) => {
+slapp.command('/feeds', 'help', (msg, text) => {
 	msg.respond(`Valid commands: \`list\`, \`connect\`, \`create\`, \`add\`, \`sources\`, \`help\`.
 	To show the currently connected feed: \`/feeds\`
 	To list all available feeds: \`/feeds list\`
@@ -413,7 +413,7 @@ function getConnectedFeedId(channelId) {
 		          },
 		          (err, response) => {
 		        	  if (err) return reject(err)
-		        	  resolve(JSON.parse(response).channel.topic.value)
+		        	  resolve(response.channel.topic.value)
 		          }
 		        )
 	})
