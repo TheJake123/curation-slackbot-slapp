@@ -320,7 +320,8 @@ slapp.command('/feeds', 'add (.+)', (msg, text, url) => {
 			}
 		})
 		msg.respond(lines.join("\n"))
-	}).catch(() => {
+	}).catch((e) => {
+		console.log(e)
 		msg.respond("Error adding source")
 	})
 })
