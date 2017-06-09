@@ -283,7 +283,7 @@ slapp.command('/feeds', 'list', (msg, text) => {
 		var lines = feeds.map(feed => {
 			return `${feed.id}. ${feed.name} (${feed.sources.length} source${feed.sources.length === 1 ? '' : 's'})`
 		})
-		msg.respond(lines.join("\n"))
+		msg.respond(`*Here is the list of all feeds:*\n${lines.join("\n")}`)
 	})
 })
 
@@ -306,11 +306,13 @@ slapp.command('/feeds', 'create (.+)', (msg, text, name) => {
 
 slapp.command('/feeds', 'add (.+)', (msg, text, url) => {
 	getConnectedFeedId(msg.meta.channel_id).then(feedId => {
-		return ncClient.add(feedId, url)
+		return new Promise ((resolve, reject) => {
+			ncClient.add(feedId, url).then(() => { resolve(feedId)}).catch(e => { reject(e)})
+		})
 	}).then(() => {
-		return ncClient.listSources(feedId)
-	}).then(sources => {
-		var lines = sources.map(source => {
+			ncClient.listSources(feedId)
+	}).then(result => {
+		var lines = result.sources.map(source => {
 			if (source.source.type == 'rss') {
 				return `RSS: ${source.source.url}`
 			} else if (source.source.type =='search') {
@@ -319,7 +321,7 @@ slapp.command('/feeds', 'add (.+)', (msg, text, url) => {
 				return `Channel: ${source.source.id}. ${source.source.name}`
 			}
 		})
-		msg.respond(lines.join("\n"))
+		msg.respond(`:white_check_mark: Successfully added source ${url}, here is the list of all sources in the feed now:\n${lines.join("\n")}`)
 	}).catch((e) => {
 		console.log(e)
 		msg.respond("Error adding source")
@@ -339,7 +341,7 @@ slapp.command('/feeds', 'sources', (msg, text) => {
 				return `Channel: ${source.source.id}. ${source.source.name}`
 			}
 		})
-		msg.respond(lines.join("\n"))
+		msg.respond(`*Here is a list of all sources in the current feed:*\n${lines.join("\n")}`)
 	})
 })
 
