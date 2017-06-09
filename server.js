@@ -287,7 +287,7 @@ slapp.command('/feeds', 'list', (msg, text) => {
 	})
 })
 
-slapp.command('/feeds', 'connect (\n+)', (msg, text, id) => {
+slapp.command('/feeds', 'connect (\d+)', (msg, text, id) => {
 	console.log(`Connecting feed ${id}`)
 	ncClient.connect().then (feeds => {
 		 slackAPIClient.send('channels.setTopic',
@@ -298,37 +298,69 @@ slapp.command('/feeds', 'connect (\n+)', (msg, text, id) => {
           (err, response) => {
         	  if (err) {
         		  console.log(err)
-	          }
-        	  msg.respond(`:white_check_mark: Feed ${id} connected to this channel`)
+        		  msg.respond(err.toString())
+        	  } else {
+            	  msg.respond(`:white_check_mark: Feed ${id} connected to this channel`)        		  
+        	  }
           }
         )
 	})
 })
 
 slapp.command('/feeds', 'create (.+)', (msg, text, name) => {
-	
+	getConnectedFeedId(msg.meta.channel_id).then(feedId => {
+		return ncClient.create(feedId, name)
+	}).then(() => {
+		return ncClient.list(feedId)
+	}).then(sources => {
+		var lines = feeds.map(feed => {
+			return `${feed.id}. ${feed.name} (${feed.sources.length} source${feed.sources.length === 1 ? '' : 's'})`
+		})
+		msg.respond(lines.join("\n"))
+	}).catch(() => {
+		msg.respond("Error creating feed")
+	})
 })
 
 slapp.command('/feeds', 'add (.+)', (msg, text, url) => {
-	 slackAPIClient.send('channels.info',
-	          {
-				 channel: msg.meta.channel_id,
-	          },
-	          (err, response) => {
-	        	  if (err) {
-	        		  console.log(err)
-		          }
-	        	  var feedId = JSON.parse(response).channel.topic.value
-	        	  msg.respond(feedId)
-	          }
-	        )
+	getConnectedFeedId(msg.meta.channel_id).then(feedId => {
+		return ncClient.add(feedId, url)
+	}).then(() => {
+		return ncClient.listSources(feedId)
+	}).then(sources => {
+		var lines = sources.map(source => {
+			if (source.source.type == 'rss') {
+				return `RSS: ${source.source.url}`
+			} else if (source.source.type =='search') {
+				return `Search: "${source.source.keywords}"`
+			} else if (source.source.type == 'channel') {
+				return `Channel: ${source.source.id}. ${source.source.name}`
+			}
+		})
+		msg.respond(lines.join("\n"))
+	}).catch(() => {
+		msg.respond("Error adding source")
+	})
 })
 
 slapp.command('/feeds', 'sources', (msg, text) => {
-	
+	getConnectedFeedId(msg.meta.channel_id).then(feedId => {
+		return ncClient.listSources(feedId)
+	}).then(sources => {
+		var lines = sources.map(source => {
+			if (source.source.type == 'rss') {
+				return `RSS: ${source.source.url}`
+			} else if (source.source.type =='search') {
+				return `Search: "${source.source.keywords}"`
+			} else if (source.source.type == 'channel') {
+				return `Channel: ${source.source.id}. ${source.source.name}`
+			}
+		})
+		msg.respond(lines.join("\n"))
+	})
 })
 
-slapp.command('/feeds', 'help', (msg, text) => {
+slapp.command('/feeds', '(help)?', (msg, text) => {
 	msg.respond(`Valid commands: \`list\`, \`connect\`, \`create\`, \`add\`, \`sources\`, \`help\`.
 	To show the currently connected feed: \`/feeds\`
 	To list all available feeds: \`/feeds list\`
@@ -372,6 +404,20 @@ slapp.action('share', 'post', (msg, value) => {
 			msg.respond(msg.body.response_url, originalMsg)
 		})	
 })
+
+function getConnectedFeedId(channelId) {
+	return new Promise((resolve, reject) => {
+		slackAPIClient.send('channels.info',
+		          {
+					 channel: channelId
+		          },
+		          (err, response) => {
+		        	  if (err) return reject(err)
+		        	  resolve(JSON.parse(response).channel.topic.value)
+		          }
+		        )
+	})
+}
 
 function addUrlToChannel(channelId, url) {
 	return new Promise((resolve, reject) => {
