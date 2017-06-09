@@ -289,22 +289,20 @@ slapp.command('/feeds', 'list', (msg, text) => {
 
 slapp.command('/feeds', /connect (\d+)/, (msg, text, id) => {
 	console.log(`Connecting feed ${id}`)
-	ncClient.connect().then (feeds => {
-		 slackAPIClient.send('channels.setTopic',
-          {
-			 channel: msg.meta.channel_id,
-			 topic: id
-          },
-          (err, response) => {
-        	  if (err) {
-        		  console.log(err)
-        		  msg.respond(err.toString())
-        	  } else {
-            	  msg.respond(`:white_check_mark: Feed ${id} connected to this channel`)        		  
-        	  }
-          }
-        )
-	})
+	 slackAPIClient.send('channels.setTopic',
+      {
+		 channel: msg.meta.channel_id,
+		 topic: id
+      },
+      (err, response) => {
+    	  if (err) {
+    		  console.log(err)
+    		  msg.respond(err.toString())
+    	  } else {
+        	  msg.respond(`:white_check_mark: Feed ${id} connected to this channel`)        		  
+    	  }
+      }
+    )
 })
 
 slapp.command('/feeds', 'create (.+)', (msg, text, name) => {
@@ -358,7 +356,7 @@ slapp.command('/feeds', 'sources', (msg, text) => {
 	})
 })
 
-slapp.command('/feeds', 'help', (msg, text) => {
+slapp.command('/feeds', '(help)?', (msg, text) => {
 	msg.respond(`Valid commands: \`list\`, \`connect\`, \`create\`, \`add\`, \`sources\`, \`help\`.
 	To show the currently connected feed: \`/feeds\`
 	To list all available feeds: \`/feeds list\`
